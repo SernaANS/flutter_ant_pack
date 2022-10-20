@@ -5,6 +5,5 @@ class InitialBindings extends Bindings {
   @override
   void dependencies() {
     Get.lazyPut(() => Controller(), fenix: true);
-    //Get.lazyPut(() => CarteraController(), fenix: true);
   }
 }

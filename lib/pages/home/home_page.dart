@@ -25,7 +25,9 @@ class _HomePageState extends State<HomePage> {
   late StreamSubscription<ConnectivityResult> _connectivitySubscription;
 
   //ScrollInfinite
-  //final PagingController<int, CharacterSummary> _pagingController =
+  //final _numberOfPostsPerRequest = 10;
+
+  //final PagingController<int, Usuario> _pagingController =
   //    PagingController(firstPageKey: 0);
 
   @override
@@ -38,14 +40,20 @@ class _HomePageState extends State<HomePage> {
         _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
 
 //ScrollInfinite
-    //_pagingController.addPageRequestListener((pageKey) {
-    //  _fetchPage(pageKey);
-    //});
+//    _pagingController.addPageRequestListener((pageKey) {
+//      if(isconected){
+//Services().getUsers()
+//      }else{
+//LocalFile().getUsers("jsons/users.json"),
+//      }
+//    });
   }
 
   @override
   void dispose() {
     _connectivitySubscription.cancel();
+
+    //_pagingController.dispose();
     super.dispose();
   }
 
@@ -71,35 +79,45 @@ class _HomePageState extends State<HomePage> {
           backgroundColor: Colors.blue,
           foregroundColor: Colors.black,
           onPressed: () {
-            Get.to(ImageCapture());
+            Get.to(const ImageCapture());
           },
           icon: Icon(Icons.image),
           label: Text('Imagen'),
         ),
-        body: Container(
-          child: isconected
-              ? FutureBuilder<List<Usuario>>(
-                  future: Services().getUsers(),
-                  builder: ((context, AsyncSnapshot<dynamic> snapshot) {
-                    if (snapshot.hasError)
-                      return Text("error");
-                    else if (snapshot.hasData)
-                      return Text(snapshot.data.toString());
-                    else
-                      return Text(snapshot.toString());
-                  }),
-                )
-              : FutureBuilder<List<Usuario>>(
-                  future: LocalFile().getUsers("jsons/users.json"),
-                  builder: ((context, AsyncSnapshot<dynamic> snapshot) {
-                    if (snapshot.hasError)
-                      return Text("error");
-                    else if (snapshot.hasData)
-                      return grid(context, snapshot.data);
-                    else
-                      return Text(snapshot.toString());
-                  }),
-                ),
+        body: Padding(
+          padding: EdgeInsets.symmetric(horizontal: Get.width * 0.015),
+          child: Column(
+            children: [
+              Text("hola"),
+              isconected
+                  ? Expanded(
+                      child: FutureBuilder<List<Usuario>>(
+                        future: Services().getUsers(),
+                        builder: ((context, AsyncSnapshot<dynamic> snapshot) {
+                          if (snapshot.hasError)
+                            return Text("error");
+                          else if (snapshot.hasData)
+                            return Text(snapshot.data.toString());
+                          else
+                            return Text(snapshot.toString());
+                        }),
+                      ),
+                    )
+                  : Expanded(
+                      child: FutureBuilder<List<Usuario>>(
+                        future: LocalFile().getUsers("jsons/users.json"),
+                        builder: ((context, AsyncSnapshot<dynamic> snapshot) {
+                          if (snapshot.hasError)
+                            return Text("error");
+                          else if (snapshot.hasData)
+                            return grid(context, snapshot.data);
+                          else
+                            return Text(snapshot.toString());
+                        }),
+                      ),
+                    ),
+            ],
+          ),
         ));
   }
 
@@ -108,7 +126,16 @@ class _HomePageState extends State<HomePage> {
       crossAxisCount: 2,
       children: List.generate(list.length, (index) {
         return Center(
-          child: Text("${list[index].name}"),
+          child: Card(
+            child: Column(
+              children: [
+                Text("${list[index].name}"),
+                Text("${list[index].email}"),
+                Text("${list[index].address!.city}"),
+                Text("${list[index].company!.name}"),
+              ],
+            ),
+          ),
         );
       }),
     );
