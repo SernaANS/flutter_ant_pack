@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -10,7 +9,7 @@ import 'package:prueba_ant_pack/Services/services.dart';
 import 'package:prueba_ant_pack/models/usuario.dart';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:prueba_ant_pack/pages/home/data_state.dart';
+import 'package:prueba_ant_pack/pages/home/image_capture.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -54,52 +53,59 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     //DataState controller = Get.put(DataState());
     return Scaffold(
-      appBar: AppBar(
-        elevation: 0,
-        title: Text("Artpack"),
-        centerTitle: true,
-        actions: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: CircleAvatar(
-              radius: 10,
-              backgroundColor: isconected ? Colors.green : Colors.red,
+        appBar: AppBar(
+          elevation: 0,
+          title: Text("Artpack"),
+          centerTitle: true,
+          actions: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: CircleAvatar(
+                radius: 10,
+                backgroundColor: isconected ? Colors.green : Colors.red,
+              ),
             ),
-          ),
-        ],
-      ),
-      body: isconected
-          ? FutureBuilder<List<Usuario>>(
-              future: Services().getUsers(),
-              builder: ((context, AsyncSnapshot<dynamic> snapshot) {
-                if (snapshot.hasError)
-                  return Text("error");
-                else if (snapshot.hasData)
-                  return Text(snapshot.data.toString());
-                else
-                  return Text(snapshot.toString());
-              }),
-            )
-          : FutureBuilder<List<Usuario>>(
-              future: LocalFile().getUsers("jsons/users.json"),
-              builder: ((context, AsyncSnapshot<dynamic> snapshot) {
-                if (snapshot.hasError)
-                  return Text("error");
-                else if (snapshot.hasData)
-                  return grid(context, snapshot.data);
-                else
-                  return Text(snapshot.toString());
-              }),
-            ),
-    );
+          ],
+        ),
+        floatingActionButton: FloatingActionButton.extended(
+          backgroundColor: Colors.blue,
+          foregroundColor: Colors.black,
+          onPressed: () {
+            Get.to(ImageCapture());
+          },
+          icon: Icon(Icons.image),
+          label: Text('Imagen'),
+        ),
+        body: Container(
+          child: isconected
+              ? FutureBuilder<List<Usuario>>(
+                  future: Services().getUsers(),
+                  builder: ((context, AsyncSnapshot<dynamic> snapshot) {
+                    if (snapshot.hasError)
+                      return Text("error");
+                    else if (snapshot.hasData)
+                      return Text(snapshot.data.toString());
+                    else
+                      return Text(snapshot.toString());
+                  }),
+                )
+              : FutureBuilder<List<Usuario>>(
+                  future: LocalFile().getUsers("jsons/users.json"),
+                  builder: ((context, AsyncSnapshot<dynamic> snapshot) {
+                    if (snapshot.hasError)
+                      return Text("error");
+                    else if (snapshot.hasData)
+                      return grid(context, snapshot.data);
+                    else
+                      return Text(snapshot.toString());
+                  }),
+                ),
+        ));
   }
 
   GridView grid(BuildContext context, List<Usuario> list) {
     return GridView.count(
-// Create a grid with 2 columns. If you change the scrollDirection to
-// horizontal, this produces 2 rows.
       crossAxisCount: 2,
-// Generate 100 widgets that display their index in the List.
       children: List.generate(list.length, (index) {
         return Center(
           child: Text("${list[index].name}"),
